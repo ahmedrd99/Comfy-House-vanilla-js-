@@ -78,24 +78,24 @@
          button.innerText ="In Cart";
          button.disabled= true; 
    } 
-button.addEventListener("click", event => {
-   event.target.innerText = "In Cart";
-   event.target.disabled = true ;
-   // get product from products
-   let cartItem ={...Storage.getProduct(id),amount:1};
-   console.log(cartItem);
-   
-   // add product to the cart
-   cart=[...cart,cartItem];
-   console.log(cart);    
-   // save cart in local storage 
-   Storage.saveCart(cart);
-   // set cart values
-     this.setCartValue(cart);
-   // display cart item 
-   this.addCartItem(cartItem);
-   // show the cart 
-   this.showCart()
+      button.addEventListener("click", event => {
+      event.target.innerText = "In Cart";
+      event.target.disabled = true ;
+      // get product from products
+      let cartItem ={...Storage.getProduct(id),amount:1};
+      console.log(cartItem);
+      
+      // add product to the cart
+      cart=[...cart,cartItem];
+      console.log(cart);    
+      // save cart in local storage 
+      Storage.saveCart(cart);
+      // set cart values
+      this.setCartValue(cart);
+      // display cart item 
+      this.addCartItem(cartItem);
+      // show the cart 
+      this.showCart()
 });
    
  });
@@ -172,13 +172,22 @@ button.addEventListener("click", event => {
        else if (event.target.classList.contains("fa-chevron-up")){
          let addAmount= event.target;
          let id= addAmount.dataset.id;
-         let tempItem =cart.find(item => item.id===id);
+         let tempItem =cart.find(item => item.id===id); // Trouve l'article dans le panier
          tempItem.amount = tempItem.amount + 1;
-         
+         Storage.saveCart(cart);
+         this.setCartValue(cart); //update the price
+         addAmount.nextElementSibling.innerText =  tempItem.amount
 
-       }
-      
-     
+      }
+
+      else if (event.target.classList.contains("fa-chevron-down")){
+         let lowerAmount = event.target;
+         let id = lowerAmount.dataset.id;
+         let tempItem =cart.find(item=>item.id===id);
+         tempItem.amount = tempItem.amount  - 1;
+         
+      }
+
       });
         }
         clearCart(){
