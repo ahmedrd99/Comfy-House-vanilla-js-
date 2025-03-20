@@ -55,7 +55,7 @@
             <img 
             src=${product.image}  alt="product" class="product-img"/>
             <button class="bag-btn" data-id=${product.id}>
-               <i class="fas fa-shopping-cart"> ADD TO BAG </i>
+               <i class="fas fa-shopping-cart"> ADD TO Cart </i>
             </button>
             </div> 
             <h3>${product.title} </h3>
@@ -71,12 +71,12 @@
    {
       const buttons = [...document.querySelectorAll(".bag-btn")];
       buttonsDOM = buttons;
- buttons.forEach(button=>{
-   let id = button.dataset.id;
-   let inCart = cart.find(item=> item.id === id );
-   if(inCart){ 
-      button.innerText ="In Cart";
-      button.disabled= true; 
+      buttons.forEach(button=>{
+      let id = button.dataset.id;
+      let inCart = cart.find(item=> item.id === id );
+      if(inCart){ 
+         button.innerText ="In Cart";
+         button.disabled= true; 
    } 
 button.addEventListener("click", event => {
    event.target.innerText = "In Cart";
@@ -100,7 +100,7 @@ button.addEventListener("click", event => {
    
  });
     }
-    setCartValue(cart){
+      setCartValue(cart){
       let tempTotal = 0;
       let itemsTotal = 0;
       cart.map(item => { 
@@ -133,24 +133,13 @@ button.addEventListener("click", event => {
          cartOverlay.classList.add("transparentBcg");
          console.log(cartDOM);  // Ajoute cette ligne pour vérifier si cartDOM est sélectionné
          cartDOM.classList.add("showCart");
+      }
 
-         console.log("Classes ajoutées :");
-         console.log("cartOverlay classes:", cartOverlay.classList);
-         console.log("cartDOM classes:", cartDOM.classList);
-         console.log("Cart Display:", cartDOM.style.display);  // Vérifie si le display du panier est modifié
-         // Afficher les styles actuels de cartDOM
-         console.log("Styles de cartDOM:", getComputedStyle(cartDOM));
-               // Ajouter un style en JS pour forcer l'affichage du panier
-
-         cartDOM.style.display = "block";  // Forcer l'affichage du panier
-         console.log("Display actuel de cartDOM:", getComputedStyle(cartDOM).display);
- 
-}
        setupAPP(){ // affiche le panier.
          cart = Storage.getCart();   
-         console.log(cart);       // Affiche le panier sauvegardé dans la console
-         this.setCartValue(cart);//met à jour le nombre d'articles au-dessus du panier.
-         this.populateCart(cart);    // remet les produits du panier dans l'affichage.
+         console.log(cart);           // Affiche le panier sauvegardé dans la console
+         this.setCartValue(cart);   //met à jour le nombre d'articles au-dessus du panier.
+         this.populateCart(cart);  // remet les produits du panier dans l'affichage.
          cartBtn.addEventListener("click",  () => {
             console.log("Bouton cartBtn cliqué !");
             this.showCart();
@@ -164,13 +153,62 @@ button.addEventListener("click", event => {
         hideCart(){ 
          console.log("hideCart() appelée !");
          cartOverlay.classList.remove("transparentBcg");
-         cartDOM.classList.remove("showCart");
+         cartDOM.classList.remove("showCart"); //cacher le  panier
         }
-        
+        cartLogic(){
+         //clear cart button 
+         clearCartBtn.addEventListener('click',()=>{this.clearCart();
+      });
+         //cart functionality
+      cartContent.addEventListener("click",event => {
+     if(event.target.classList.contains("remove-item")) 
+      {
+      let removeItem = event.target; //stock élement cliqué dans cette variable 
+      let id = removeItem.dataset.id;
+     cartContent.removeChild( 
+     removeItem.parentElement.parentElement); 
+      this.removeItem(id )
+      }
+       else if (event.target.classList.contains("fa-chevron-up")){
+         let addAmount= event.target;
+         let id= addAmount.dataset.id;
+         let tempItem =cart.find(item => item.id===id);
+         tempItem.amount = tempItem.amount + 1;
+         
+
+       }
+      
+     
+      });
+        }
+        clearCart(){
+         let cartItems = cart.map(item=>item.id);  //Crée un nouveau tableau (cartItems) contenant uniquement les id des articles dans le panier
+         cartItems.forEach(id => this.removeItem(id)) // cela supprime chaque article du tableau 
+         console.log(cartContent.children);
+         while(cartContent.children.length>0) // supprimer chaque element dans cart un par un 
+            {
+            cartContent.removeChild(cartContent.children[0])
+            }
+         this.hideCart(); //cache le panier
+         
+         
+         console.log(cartItems);
+        }
+        removeItem(id) {
+         cart = cart.filter(item => item.id !==id ); //crée un nv tableau exclu ceux qui ne sont pas supprimé
+         this.setCartValue(cart); //pour rendre le nouveau total de cart 
+         Storage.saveCart(cart); // Sauvegarde le panier dans le localStorage
+         let button = this.getSinglebutton(id); 
+         button.disabled = false; 
+         button.innerHTML= `<i class=fas fa-shopping-cart></i>add to cart`;// Met à jour le texte du bouton
+         }
+        getSinglebutton(id){
+         return buttonsDOM.find(button => button.dataset.id === id);
+        }
  };//end of class UI 
   
  // local Storage 
- class Storage{
+ class Storage {
     static saveProducts(products){
       localStorage.setItem("products",JSON.stringify(products));
       console.log("Produits sauvegardés dans le localStorage :", products);
@@ -200,7 +238,7 @@ products.getProducts().then(products => {
       Storage.saveProducts(products);
 }).then(()=>{
    ui.getBagButtons(); 
-   
+   ui.cartLogic();
 })
  });
 
