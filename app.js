@@ -185,7 +185,18 @@
          let id = lowerAmount.dataset.id;
          let tempItem =cart.find(item=>item.id===id);
          tempItem.amount = tempItem.amount  - 1;
-         
+         if(tempItem.amount >0){
+            
+         Storage.saveCart(cart);
+         this.setCartValue(cart);
+         lowerAmount.previousElementSibling.innerText = tempItem.amount
+        
+      }
+         else{
+            cartContent.removeChild
+            (lowerAmount.parentElement.parentElement);
+             this.removeItem(id)
+         }
       }
 
       });
